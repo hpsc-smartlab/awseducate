@@ -1,0 +1,2 @@
+# awseducate
+AWS Exercises
