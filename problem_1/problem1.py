@@ -1,15 +1,14 @@
 import boto3
 from botocore.exceptions import ClientError
 
-# Notes: If you specify more instances than Amazon EC2 can launch in the target Availability Zone, 
-# Amazon EC2 launches the largest possible number of instances above MinCount. 
-# If you specify a minimum that is more instances than Amazon EC2 can launch in the target Availability Zone, 
-# Amazon EC2 launches no instances at all.
-
+''' Notes: 
+	-	If you specify more instances than Amazon EC2 can launch in the target Availability Zone, Amazon EC2 launches the largest possible number of instances above MinCount.
+	-	If you specify a minimum that is more instances than Amazon EC2 can launch in the target Availability Zone,  Amazon EC2 launches no instances at all.
+'''
 def ec2ResourceLaunch(mincount, maxcount, ami, instancetype = 't2.micro', sync = True):
-	
-	''' Launches -maxcount- instances of -InstanceType- with the specified ami using object oriented interface (resource)
-		and returns the related object interfaces
+	''' Launches -maxcount- instances of -InstanceType- 
+		with the specified ami using high-level resource interface
+		and returns the related objects
 
 		@type mincount:     	integer
 		@param mincount:    	minimum number of instances to launch
@@ -67,23 +66,22 @@ def ec2ResourceLaunch(mincount, maxcount, ami, instancetype = 't2.micro', sync =
 	return instances
 
 def ec2ClientLaunch(mincount, maxcount, ami, instancetype = 't2.micro', sync = True):
-	
-	''' 
-	Launches -maxcount- instances of -InstanceType- with the specified ami
-	and returns the related object interfaces
+	''' Launches -maxcount- instances of -InstanceType-
+		using low-level client interface
+		with the specified ami and returns the operation response
 
-	@type mincount:     	integer
-	@param mincount:    	minimum number of instances to launch
-	@type maxcount:     	integer
-	@param maxcount:    	maximum number of instances to launch
-	@type ami:          	string
-	@param ami:         	amazon machine image deployed
-	@type instancetype:   	string
-	@param instancetype: 	type of launched instances
-	@type sync:				boolean
-	@param sync: 			wait for the operation to take effect
-	@rtype:    dict
-	@return:   response dict containing the information of the running instances
+		@type mincount:     	integer
+		@param mincount:    	minimum number of instances to launch
+		@type maxcount:     	integer
+		@param maxcount:    	maximum number of instances to launch
+		@type ami:          	string
+		@param ami:         	amazon machine image deployed
+		@type instancetype:   	string
+		@param instancetype: 	type of launched instances
+		@type sync:				boolean
+		@param sync: 			wait for the operation to take effect
+		@rtype:    dict
+		@return:   response dict containing information about running instances
 	'''
 
 	# Low level AWS client 1:1 interface
@@ -120,7 +118,7 @@ def ec2ClientLaunch(mincount, maxcount, ami, instancetype = 't2.micro', sync = T
 			print "waiting for the instance to be in running state"
 			waiter.wait(InstanceIds=[my_id])
 			
-		info = ec2client.describe_instances(InstanceIds = ids)
+		info = ec2client.describe_instances(InstanceIds=ids)
 
 		for reservation in info['Reservations']:
 			for instance in reservation['Instances']:
@@ -133,8 +131,9 @@ def ec2ClientLaunch(mincount, maxcount, ami, instancetype = 't2.micro', sync = T
 
 	return response
 
-def ec2ResourceStop(ids, force = False, sync = True):
-	''' stops running instances
+def ec2ResourceStop(ids, force = False, sync = True):	
+	''' Stops running instances
+		using high-level resource interface
 
 		@type ids:		[string,...,string]
 		@param ids:		ids of the instances
@@ -174,7 +173,8 @@ def ec2ResourceStop(ids, force = False, sync = True):
 	return response
 
 def ec2ClientStop(ids, force = False, sync = True):
-	''' stops running instances
+	''' Stops running instances
+		using low-level client interface
 
 		@type ids:		[string,...,string]
 		@param ids:		ids of the instances
@@ -207,7 +207,7 @@ def ec2ClientStop(ids, force = False, sync = True):
 				print "waiting for the instance to be in stopped state"
 				waiter.wait(InstanceIds=[my_id])
 
-			info = ec2client.describe_instances(InstanceIds = ids)
+			info = ec2client.describe_instances(InstanceIds=ids)
 
 			for reservation in info['Reservations']:
 				for instance in reservation['Instances']:
@@ -220,7 +220,8 @@ def ec2ClientStop(ids, force = False, sync = True):
 	return response
 
 def ec2ResourceStart(ids, sync = True):
-	''' starts stopped instances
+	''' Starts stopped instances
+		using high-level resource interface
 
 		@type ids:		[string,...,string]
 		@param ids:		ids of the instances
@@ -257,7 +258,8 @@ def ec2ResourceStart(ids, sync = True):
 	return response
 
 def ec2ClientStart(ids, sync = True):
-	''' starts stopped instances
+	''' Starts stopped instances
+		using low-level client interface
 
 		@type ids:		[string,...,string]
 		@param ids:		ids of the instances
@@ -300,7 +302,8 @@ def ec2ClientStart(ids, sync = True):
 	return response
 
 def ec2ResourceTerminate(ids, sync = True):
-	''' termiates running/stopped instances
+	''' Termiates running/stopped instances
+		using high-level resource interface
 
 		@type ids:		[string,...,string]
 		@param ids:		ids of the instances
@@ -337,7 +340,8 @@ def ec2ResourceTerminate(ids, sync = True):
 	return response
 
 def ec2ClientTerminate(ids, sync = True):
-	''' terminates running/stopped instances
+	''' Terminates running/stopped instances
+		using low-level client interface
 
 		@type ids:		[string,...,string]
 		@param ids:		ids of the instances
@@ -380,7 +384,9 @@ def ec2ClientTerminate(ids, sync = True):
 	return response
 
 def ec2ResourceListInstanceByStatus(status):
-	''' list all instances in a given status
+	''' List all instances in a given status
+		using high-level resource interface
+
 		@type status:		string
 		@param status:		running|terminated|stopped...
 		@rtype:    [ec2factoryObj, ..., ec2factoryObj]
@@ -406,7 +412,9 @@ def ec2ResourceListInstanceByStatus(status):
 	return instances
 
 def ec2ClientListInstanceByStatus(status):
-	''' list all instances in a given status
+	''' List all instances in a given status
+		using low-level client interface
+
 		@type status:		string
 		@param status:		running|terminated|stopped...
 		@rtype:    [dict,...,dict]
@@ -433,7 +441,8 @@ def ec2ClientListInstanceByStatus(status):
 	return info
 
 def ec2ClientModifyInstanceType(ids, new_type):
-	''' Change instance type, only works if instance is stopped
+	''' Change instance type, using high level resource interface 
+		only works if instance is stopped
 
 		@type ids:		[string,...,string]
 		@param ids:		ids of the instances
@@ -479,8 +488,9 @@ def ec2ClientModifyInstanceType(ids, new_type):
 	return None
 	
 def ec2ResourceModifyInstanceType(ids, new_type):
-	''' Change instance type, only works if instance is stopped
-
+	''' Change instance type, using low-level client interface
+		only works if instance is stopped
+		
 		@type ids:		[string,...,string]
 		@param ids:		ids of the instances
 		@type new_type:	string
